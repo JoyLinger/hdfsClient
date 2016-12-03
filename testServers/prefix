@@ -1,0 +1,10 @@
+#!/bin/bash
+DIR=`dirname $0`
+DIR=`cd ${DIR};pwd`
+if [ -f ${DIR}/install.conf ];then
+   source ${DIR}/install.conf
+else
+   echo "Test Servers Failed!"
+fi
+
+User=$kerberosname

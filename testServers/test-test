@@ -1,0 +1,77 @@
+echo ---------Test Hdfs----------------
+thdfs dfs -ls  / >> /dev/null
+if [ $? -eq 0 ];then
+echo "The HDFS is running NORMAL!!" >> /tmp/HDFS_test_list-Successfull-`date +%s`
+else
+echo "The HDFS is running with something wrong!!" >> /tmp/HDFS_test_list-faild-`date +%s`
+fi
+
+thdfs dfs -mkdir /user/$User/test >/dev/null 2>&1
+if [ $? -eq 0 ];then
+echo "The HDFS is running NORMAL!!" >> /tmp/HDFS_test_mkdir-Successfull-`date +%s`
+
+thdfs dfs -put ${DIR}/INSTRUCTION /user/$User/test >>/dev/null
+if [ $? -eq 0 ];then
+echo "The HDFS is running NORMAL!!" >> /tmp/HDFS_test_put-Successfull-`date +%s`
+else
+echo "The HDFS is running with something wrong!!" >> /tmp/HDFS_test_put-faild-`date +%s`
+exit 10
+fi
+else
+echo "The HDFS is running with something wrong!!" >> /tmp/HDFS_test_mkdir-faild-`date +%s`
+fi
+thdfs dfs -rm -R /user/$User/test >/dev/null 2>&1
+if [ $? -eq 0 ];then
+echo "The HDFS is running NORMAL!!" >> /tmp/HDFS_test_rm-Successfull-`date +%s`
+else
+echo "The HDFS is running with something wrong!!" >> /tmp/HDFS_test_rm-faild-`date +%s`
+exit 10
+fi
+
+
+echo ------------Test Hbase--------------
+echo "list" |thbase shell >/dev/null 2>&1
+if [ $? -eq 0 ];then
+echo "The hybase is running normal!">>/tmp/hybase-list_test_Successfull-`date +%s`
+else
+echo "There something wrong with hybase.Please check it quickly!">>/tmp/hybase-list_test_Failed-`date +%s`
+fi
+
+
+echo "create 'test_huaxin02','F01'" |thbase shell >/dev/null 2>&1
+if [ $? -eq 0 ];then
+echo "The hybase is running normal!">>/tmp/hybase-create_test_Successfull-`date +%s`
+echo "put 'test_huaxin02','000001','F01:col1','Successfull'" |thbase shell >/dev/null 2>&1
+if [ $? -eq 0 ];then
+echo "The hybase is running normal!">>/tmp/hybase-put_test_Successfull-`date +%s`
+else
+echo "There something wrong with hybase.Please check it quickly!">>/tmp/hybase-put_test_Failed-`date +%s`
+fi
+else
+echo "There something wrong with hybase.Please check it quickly!">>/tmp/hybase-create_test_Failed-`date +%s`
+fi
+
+
+echo "get 'test_huaxin02','000001'" |thbase shell >/dev/null 2>&1
+if [ $? -eq 0 ];then
+echo "The hybase is running normal!">>/tmp/hybase-get_test_Successfull-`date +%s`
+else
+echo "There something wrong with hybase.Please check it quickly!">>/tmp/hybase-get_test_Failed-`date +%s`
+fi
+
+
+echo "disable 'test_huaxin02'"|thbase shell >/dev/null 2>&1
+echo "drop 'test_huaxin02'"|thbase shell >/dev/null 2>&1
+if [ $? -eq 0 ];then
+echo "The table  is drop Successfully!">>/tmp/hybase-drop_table_test_Successfull-`date +%s`
+else
+echo "There something wrong with drop table.Please check it quickly!">>/tmp/hybase-drop_table_test_Failed-`date +%s`
+fi
+
+echo ------------Test Yarn---------
+tyarn jar ${DIR}/base/hadoop-mapreduce/hadoop-mapreduce-examples.jar pi 10 10 >>/dev/null 2>&1
+if [ $? -eq 0 ];then
+echo "The Mapreduce is running normal!">>/tmp/YARN_test_mapreduce-Successfull-`date +%s`
+else
+echo "The Mapreduce is running with something wrong,please check it quickly!">>/tmp/YARN_test_mapreduce-Failed-`date +%s`
+fi

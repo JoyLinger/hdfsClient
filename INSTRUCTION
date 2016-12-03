@@ -1,0 +1,24 @@
+Declare:
+   这份文档是为了介绍关于这个只有hdfs服务的客户端的各个目录的具体内容的介绍，想了解HDFS这个服务的话，您可以深入这些目录下进行查看。
+Prepare:
+   执行install.sh这个一键式安装客户端的脚本所做的内容包括：
+     1、首先对您的这台主机里面是否安装了jdk进行判断，如果没有安装，这个脚本将会自动帮您在/usr/local/java里面安装jdk1.7的版本;如果已经
+安装了jdk1.6.*，这个安装脚本将会退出此次安装(如果您对这个jdk1.6.*没有什么特别需求，请您直接将其删除，然后再次执行install.sh这个脚本);如果您的主机里已经安装了jdk1.7.*，那么这个安装脚本将继续以下的安装。
+     2、然后安装好了jdk1.7.*之后，就是将不同集群的配置文件拷贝到~/hadoop-clients/base/conf/hadoop/conf这个目录下，将不同集群配置目录下的hosts文件添加到/etc/hosts里面，将krb5.conf拷贝到/etc目录下。
+     3、在这个脚本里会调用~/hadoop-clients/hadoopconfigupdater/update.sh这个脚本，这个脚本是用来和集群的配置文件进行同步更新的。
+     4、然后就会安装~/hadoop-clients/kerberos/目录下的krb5-client-1.6.3-133.49.54.1.x86_64.rpm,这是Kerberos的安装包，只有安装了这个包
+之后才能够使用Kerberos认证。
+     5、最后将同步更新的update.sh的文件执行路径传到/etc/rc.local文件里，这样每次重启这台主机的时候，会自动调用这个脚本来达到同步集群里的配置文件到您的客户端里。
+Directory Explain:
+base           :这个目录下的bin是各个服务的执行脚本，conf目录下是各个服务的配置文件的位置，hadoop、hadoop-hdfs、hadoop-mapreduce、hadoop-yarn、hbase是各个服务的主目录，在这些目录里您可以找到关于各项服务的所有内容。
+hadoopconfigupdater     :这个目录是设置能够自动与集群中的xml配置文件自动同步的，这个目录下的update.sh是执行脚本，您可以按照README里面的说明进行执行该脚本来同步您的客户端的各个服务的配置文件。
+inceptor       :这个目录是inceptor服务的主目录，在这个目录下包含了这项服务的所有内容。
+kerberos       :这个目录下主要包含了Kerberos的安装包。
+spark          :这个目录下主要包含了spark-1.5的所有内容。
+spark2         :这个目录下主要包含了spark-2.0.1的所有内容。
+sqoop          :这个目录下主要是sqoop服务，是用来与关系型数据库中的数据进行相互传递的工具。
+hadoop-clients/base/conf/babylon-conf      :这个目录是计算集群中的所有配置文件的存放位置。
+hadoop-clients/base/conf/olympus-conf      :这个目录是非计算集群中的所有配置文件的存放位置。
+hadoop-clients/base/conf/test-conf         :这个目录是测试集群中的所有配置文件的存放位置。
+ 
+  

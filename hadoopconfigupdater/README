@@ -1,0 +1,51 @@
++-----------------------------------+
+|  Name    :hadoopconfigupdater-1.2 |
+|  Author  :黄鹏程                  |
+|  Version :1.2V                    |
++-----------------------------------+
+Declare:
+  Hadoopconfigupdater工具实现户端内各个服务的配置文件与集群里的配置文件自动同步更新，达到不用用户手动更新自己客户端内的配置文件。
+
+Usage:
+  TDH各服务配置文件由运维人员统一更新，因此，客户端仅仅需要将文件从Zookeeper中pull到自己client端指定目录即可。
+  ./hadoopconfigupdater-1.2 -zk $Hostname:2181 -pull -pullfiles /$DIR/$FILE,/$DIR2/$FILE2.... -c APPEND|OVERWRITE -pullmode WATCH &
+      -zk           : 指定Zookeeper集群节点
+      $Hostname     : 指集群中安装了zookeeper服务的节点的HOSTNAME
+      2181          : Zookeeper服务的默认端口号
+      $Dir,$Dir2    : 选择要将集群中的配置文件所要放置的目录下的路径
+      $FILE,$FILE2  : 选择集群中需要同步更新的主要文件
+      -c APPEND     : 将zookeeper中的文件内容添加到$FILE,$FILE2中
+      -c OVERWRITE  : 将zookeeper中的文件拷贝到$FILE,$FILE2中,并覆盖原来的文件
+      -pullmode     : 集群中取文件的模式，主要包含了两种模式:WATCH和ONCE
+      WATCH         : 监控模式，每当Zookeeper中文件更新，只要是在该模式下，就会自动将更新过的文件下载到指定的本地的目录下。
+      ONCE          : 一次性下载文件模式，将配置文件从Zookeeper中下载到本地目录并结束工具，默认设置为ONCE模式.
+      &             : 当HadoopconfigUpdater为WATCH模式时，推荐在后台运行
+
+  TDH需要更新的配置文件:
+    1. Hadoop配置文件    : hdfs-site.xml、core-site.xml、mapred-site.xml、yarn-site.xml
+                           配置文件在Client端 hadoop-client-*/base/conf/conf/hadoop/conf目录下
+    2. Hyperbase配置文件 : hbase-site.xml
+                           配置文件在Client端 hadoop-client-*/hbase/conf目录下
+    3. Hosts文件         : /etc/hosts
+                           这个主要是为了当集群中新添加了节点时同步hosts文件，并且这个需要该用户有sudo权限.
+
+Demo:
+1. Hadoop,Hyperbase配置文件自动更新：
+./hadoopconfigupdater-1.2 -zk tw-suse2204:2181 -pull -pullfiles \
+/home/$user/hadoop-client-babylon/base/conf/hadoop/conf/hdfs-site.xml, \
+/home/$user/hadoop-client-babylon/base/conf/hadoop/conf/core-site.xml, \
+/home/$user/hadoop-client-babylon/base/conf/hadoop/conf/mapred-site.xml, \
+/home/$user/hadoop-client-babylon/base/conf/hadoop/conf/yarn-site.xml, \
+/home/$user/hadoop-client-babylon/hbase/conf/hbase-site.xml, \
+-c OVERWRITE -pullmode WATCH &
+
+
+2.修改/etc/sudoers文件，使得该用户能够使用sudo命令来执行这个工具脚本命令，依次执行下面的命令：
+     a、在root用户下，使用命令：vim /etc/sudoers
+     b、在'root    ALL=(ALL)       ALL'这一行的下面添加:'$user ALL=NOPASSWD:/$Dir3/hadoopconfigupdater-1.2'
+            $User:你要赋予能够使用sudo命令权限的用户名
+            $Dir3:这个工具的放置目录
+            
+            
+3.只有当该用户拥有sudo权限之后才能使用下面的命令将hosts文件设置为自动更新：
+sudo ./hadoopconfigupdater-1.2 -zk tw-suse2204:2181 -pull -pullfiles /etc/hosts -c APPEND -pullmode WATCH &
